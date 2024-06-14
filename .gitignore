@@ -1,1 +1,3 @@
 datafolder/
+
+*.ipynb_checkpoints/

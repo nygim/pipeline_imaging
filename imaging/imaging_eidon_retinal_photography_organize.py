@@ -4,6 +4,21 @@ import imaging_classifying_rules
 
 
 def filter_eidon_files(file, outputfolder):
+    """
+    Filter and process EIDON files based on classification rules.
+
+    This function applies classification rules to a DICOM file, extracts relevant information,
+    and copies the file to an appropriate output directory based on the classification rule.
+
+    Args:
+        file (str): The path to the DICOM file to be processed.
+        outputfolder (str): The directory where the processed files will be stored.
+
+    Returns:
+        dict: A dictionary containing information about the processed file, including rule, patient ID, 
+        patient name, laterality, rows, columns, SOP instance UID, series instance UID, filename, 
+        original file path, and any errors encountered.
+    """
 
     filename = file.split("/")[-1]
     rule = imaging_classifying_rules.find_rule(file)

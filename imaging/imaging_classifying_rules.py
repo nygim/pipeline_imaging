@@ -1,20 +1,36 @@
 import os
 import pydicom
 
-
+# Class representing a rule for classifying DICOM entries
 class ClassifyingRule:
+    """
+    Represents a classification rule for processing DICOM entries.
+
+    This class defines a rule used for classifying DICOM entries based on specific conditions.
+    It contains attributes such as the rule's name and a list of conditions that must be met 
+    for the rule to apply.
+
+    Attributes:
+        name (str): The name of the classification rule.
+        conditions (list): List of lambda functions representing the conditions.
+
+    Methods:
+        apply(dicom_entry): Checks if the DICOM entry meets all conditions.
+    """
     def __init__(self, name, conditions):
         self.name = name
         self.conditions = conditions
 
     def apply(self, dicom_entry):
+        # Apply all conditions to the DICOM entry
         for condition in self.conditions:
             if not condition(dicom_entry):
                 return False
         return True
 
-
+# List of classification rules
 rules = [
+    # Define various classification rules with specific conditions
     ClassifyingRule(
         "maestro2_octa_segmentation",
         conditions=[
@@ -315,8 +331,37 @@ rules = [
     ),
 ]
 
-
+# Class representing a DICOM entry
 class DicomEntry:
+    """
+    Represents a DICOM entry with various attributes.
+
+    This class holds the detailed information of a DICOM file including filename, patient ID,
+    SOP class UID, slice thickness, etc.
+
+    Attributes:
+        filename (str): The name of the DICOM file.
+        filesize (float): The size of the DICOM file in MB.
+        patientid (str): The patient ID.
+        sopclassuid (str): The SOP class UID.
+        sopinstanceuid (str): The SOP instance UID.
+        laterality (str): The laterality information.
+        rows (int): The number of rows in the image.
+        columns (int): The number of columns in the image.
+        device (str): The device used for capturing the image.
+        framenumber (int): The frame number.
+        referencedsopinstance (str): The referenced SOP instance.
+        slicethickness (float): The slice thickness.
+        privatetag (str): Private tag information.
+        acquisitiondatetime (str): The acquisition date and time.
+        performedprotocol (str): The performed protocol.
+        seriesdescription (str): The series description.
+        studyid (str): The study ID.
+        gaze (str): The gaze information.
+        seriesuid (str): The series UID.
+        error (str): Error information.
+        name (str): The name of the patient.
+    """
     def __init__(
         self,
         filename,
@@ -363,8 +408,22 @@ class DicomEntry:
         self.error = error
         self.name = name
 
-
+# Class representing a summary of a DICOM entry
 class DicomSummary:
+    """
+    Represents a summary of a DICOM entry.
+
+    This class holds a summarized version of a DICOM file including filename, patient ID,
+    laterality, description, acquisition date and time, and SOP instance UID.
+
+    Attributes:
+        filename (str): The name of the DICOM file.
+        patientid (str): The patient ID.
+        laterality (str): The laterality information.
+        description (str): Description of the DICOM entry based on classification rules.
+        acquisitiondatetime (str): The acquisition date and time.
+        sopinstanceuid (str): The SOP instance UID.
+    """
     def __init__(
         self,
         filename,
@@ -381,8 +440,17 @@ class DicomSummary:
         self.acquitisiondatetime = acquisitiondatetime
         self.sopinstanceuid = sopinstanceuid
 
-
+# Function to extract information from a DICOM file and create a DicomEntry object
 def extract_dicom_entry(file):
+    """
+    Extract detailed information from a DICOM file and create a DicomEntry object.
+
+    Args:
+        file (str): The path to the DICOM file.
+
+    Returns:
+        DicomEntry: An object containing detailed information about the DICOM file.
+    """
     if not os.path.exists(file):
         raise FileNotFoundError(f"File {file} not found.")
 
@@ -434,6 +502,7 @@ def extract_dicom_entry(file):
         referencedsopinstance
     ) = gaze = "N/A"
 
+     # Extract specific attributes based on SOP Class UID
     if "00200062" in dicom and "Value" in dicom["00200062"]:
         laterality = dicom["00200062"]["Value"][0]
     elif "00200060" in dicom and "Value" in dicom["00200060"]:
@@ -442,7 +511,7 @@ def extract_dicom_entry(file):
         laterality = "NA"
         error = f"no laterality: {file}"
 
-    # retinal photography
+    # Extract attributes for retinal photography
     if sopclassuid == "1.2.840.10008.5.1.4.1.1.77.1.5.1":
         rows = dicom["00280010"]["Value"][0]
         columns = dicom["00280011"]["Value"][0]
@@ -465,7 +534,7 @@ def extract_dicom_entry(file):
         else:
             gaze = "N/A"
 
-    # OCT
+    # Extract attributes for OCT
     elif sopclassuid == "1.2.840.10008.5.1.4.1.1.77.1.5.4":
         rows = dicom["00280010"]["Value"][0]
         columns = dicom["00280011"]["Value"][0]
@@ -494,21 +563,21 @@ def extract_dicom_entry(file):
         else:
             slicethickness = ""
 
-    # Seg
+    # Extract attributes for Segmentation
     elif sopclassuid == "1.2.840.10008.5.1.4.1.1.66.5":
         seriesdescription = dicom["0008103E"]["Value"][0]
         device = dicom["00081090"]["Value"][0]
         privatetag = "N/A"
         slicethickness = 0
 
-    # Vol
+    # Extract attributes for Volume
     elif sopclassuid == "1.2.840.10008.5.1.4.1.1.77.1.5.8":
         seriesdescription = dicom["0008103E"]["Value"][0]
         device = dicom["00081090"]["Value"][0]
         privatetag = "N/A"
         slicethickness = 0
 
-    # En Face
+    # Extract attributes for En Face
     elif sopclassuid == "1.2.840.10008.5.1.4.1.1.77.1.5.7":
         device = dicom["00081090"]["Value"][0]
         privatetag = "N/A"
@@ -550,6 +619,19 @@ def extract_dicom_entry(file):
 
 ## Domain, Modality, Protocol, Patient ID, Laterlity, sopinstanceuid, referencedsopinstance
 def extract_dicom_summary(file):
+    """
+    Extract a summary from a DICOM file.
+
+    This function extracts detailed information from a DICOM file using the extract_dicom_entry function,
+    then summarizes this information into a DicomSummary object.
+
+    Args:
+        file (str): The path to the DICOM file.
+
+    Returns:
+        DicomSummary: An object containing summarized information about the DICOM file.
+    """
+
     dicomentry = extract_dicom_entry(file)
     sopclassuid = dicomentry.sopclassuid
 
@@ -580,6 +662,17 @@ def extract_dicom_summary(file):
 
 
 def get_summary(file):
+    """
+    Get a summary of a DICOM file.
+
+    This function checks if the file is a valid DICOM file and then extracts its summary.
+
+    Args:
+        file (str): The path to the file.
+
+    Returns:
+        dict: A dictionary representation of the DICOM summary, or an error message if the file is not valid.
+    """
     if file.endswith(".dcm") or file[-8:].isdigit():
         dicomsummary = extract_dicom_summary(file)
         obj_dict = vars(dicomsummary)
@@ -589,6 +682,18 @@ def get_summary(file):
 
 
 def find_rule(file):
+    """
+    Find and apply classification rules to a DICOM file.
+
+    This function checks if the file is a valid DICOM file and then applies classification rules
+    to determine the appropriate classification.
+
+    Args:
+        file (str): The path to the file.
+
+    Returns:
+        str: The name of the classification rule that applies, or "no_rules_apply" if none apply.
+    """
     if file.endswith(".dcm") or file[-8:].isdigit():
         dicomentry = extract_dicom_entry(file)
         matching_rules = [rule for rule in rules if rule.apply(dicomentry)]
@@ -600,6 +705,18 @@ def find_rule(file):
 
 
 def is_dicom_file(file_path):
+    """
+    Find and apply classification rules to a DICOM file.
+
+    This function checks if the file is a valid DICOM file and then applies classification rules
+    to determine the appropriate classification.
+
+    Args:
+        file (str): The path to the file.
+
+    Returns:
+        str: The name of the classification rule that applies, or "no_rules_apply" if none apply.
+    """
     try:
         pydicom.dcmread(file_path)
         return True

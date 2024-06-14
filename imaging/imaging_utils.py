@@ -6,6 +6,18 @@ import pydicom
 
 
 def get_filtered_file_names(folder_path):
+    """
+    Get filtered file names from a folder.
+
+    This function walks through a folder and filters out files that don't start with a valid
+    character (alphabet or digit) and aren't hidden files (starting with "._").
+
+    Args:
+        folder_path (str): The path to the folder to search for files.
+
+    Returns:
+        list: A list of filtered file paths.
+    """
     filtered_files = []
     for root, dirs, files in os.walk(folder_path):
         for file in files:
@@ -21,6 +33,18 @@ def get_filtered_file_names(folder_path):
 
 
 def spectralis_get_filtered_file_names(folder_path):
+    """
+    Get filtered file names from a folder.
+
+    This function walks through a folder and filters out files that don't start with a valid
+    character (alphabet or digit) and aren't hidden files (starting with "._").
+
+    Args:
+        folder_path (str): The path to the folder to search for files.
+
+    Returns:
+        list: A list of filtered file paths.
+    """
     filtered_files = []
     for root, dirs, files in os.walk(folder_path):
         for file in files:
@@ -42,6 +66,16 @@ def spectralis_get_filtered_file_names(folder_path):
 
 
 def list_subfolders(folder_path):
+    """
+    List all subfolders in a given folder.
+
+    Args:
+        folder_path (str): The path to the folder.
+
+    Returns:
+        list: A list of paths to subfolders.
+    """
+
     if not os.path.isdir(folder_path):
         print("Invalid folder path.")
         return []
@@ -54,6 +88,16 @@ def list_subfolders(folder_path):
 
 
 def check_files_in_folder(folder_path, file_names):
+    """
+    Check if specific files exist in a folder.
+
+    Args:
+        folder_path (str): The path to the folder.
+        file_names (list): A list of file names to check for.
+
+    Returns:
+        bool: True if all files are present, False otherwise.
+    """
     files = os.listdir(folder_path)
 
     for file_name in file_names:
@@ -64,6 +108,15 @@ def check_files_in_folder(folder_path, file_names):
 
 
 def topcon_check_files_expected(folder_path):
+    """
+    Check if a folder contains the expected number of specific files for Topcon devices.
+
+    Args:
+        folder_path (str): The path to the folder.
+
+    Returns:
+        str: "Expected" if the files match the expected patterns, otherwise "Unknown".
+    """
 
     files_count_9 = 0
 
@@ -92,6 +145,18 @@ def topcon_check_files_expected(folder_path):
 
 
 def topcon_process_folder(folder_path, outputpath, rule, empty_df):
+    """
+    Process a folder of Topcon device files and copy them to an output directory based on rules.
+
+    Args:
+        folder_path (str): The path to the folder to process.
+        outputpath (str): The path to the output directory.
+        rule (str): The classification rule to apply.
+        empty_df (pd.DataFrame): A DataFrame to store information about processed files.
+
+    Returns:
+        pd.DataFrame: Updated DataFrame with information about processed files.
+    """
     for root, dirs, files in os.walk(folder_path):
         for file in files:
             if file.endswith("1.1.dcm") and file.startswith("2"):
@@ -131,6 +196,21 @@ def topcon_process_folder(folder_path, outputpath, rule, empty_df):
 
 
 def filter_eidon_files(file, outputfolder):
+    """
+    Filter and process EIDON files based on classification rules.
+
+    This function applies classification rules to a DICOM file, extracts relevant information,
+    and copies the file to an appropriate output directory based on the classification rule.
+
+    Args:
+        file (str): The path to the DICOM file to be processed.
+        outputfolder (str): The directory where the processed files will be stored.
+
+    Returns:
+        dict: A dictionary containing information about the processed file, including rule, patient ID, 
+        patient name, laterality, rows, columns, SOP instance UID, series instance UID, filename, 
+        original file path, and any errors encountered.
+    """
 
     filename = file.split("/")[-1]
     rule = imaging_classifying_rules.find_rule(file)
@@ -272,6 +352,16 @@ device_folder_mapping = {
 
 
 def get_description(filename, mapping):
+    """
+    Get a description based on a filename and a mapping dictionary.
+
+    Args:
+        filename (str): The name of the file.
+        mapping (dict): A dictionary mapping keys to descriptions.
+
+    Returns:
+        str: The description corresponding to the filename, or "Description not found" if no match is found.
+    """
     for key, value in mapping.items():
         if key in filename:
             return value
@@ -279,6 +369,15 @@ def get_description(filename, mapping):
 
 
 def check_format(string):
+    """
+    Check if a string follows a specific format.
+
+    Args:
+        string (str): The string to check.
+
+    Returns:
+        bool: True if the string follows the format "AIREADI-XXXX" where XXXX are digits, otherwise False.
+    """
     if string.startswith("AIREADI-"):
         digits = string[len("AIREADI-") : len("AIREADI-") + 4]
         if len(digits) == 4 and digits[0] in ["1", "4", "7"] and digits.isdigit():
@@ -287,6 +386,15 @@ def check_format(string):
 
 
 def find_number(val):
+    """
+    Find the first four-digit number in a string.
+
+    Args:
+        val (str): The string to search.
+
+    Returns:
+        str: The first four-digit number found, or "noid" if none is found.
+    """
     is_number = False
     buffer = []
     for i in range(len(val)):
@@ -302,6 +410,20 @@ def find_number(val):
 
 
 def find_id(patientid, patientname):
+    """
+    Find a patient ID based on the given patient ID and name.
+
+    This function checks the patient ID and name to extract a valid ID. It first checks if
+    the ID follows a specific format, and if not, it searches for a number within the ID
+    or name strings.
+
+    Args:
+        patientid (str): The patient ID.
+        patientname (str): The patient name.
+
+    Returns:
+        str: The extracted patient ID or "noid" if no valid ID is found.
+    """
     patientid = (
         ""
         if patientid == "None" or patientid is None or not isinstance(patientid, str)
@@ -329,6 +451,19 @@ def find_id(patientid, patientname):
 
 
 def format_file(file, output):
+    """
+    Format a DICOM file and save it to an output directory.
+
+    This function reads a DICOM file, extracts relevant information, and formats it according to
+    specified rules. It then saves the formatted file to the appropriate output directory.
+
+    Args:
+        file (str): The path to the DICOM file to be formatted.
+        output (str): The base path to the output directory.
+
+    Returns:
+        dict: A dictionary containing protocol, patient ID, and laterality information.
+    """
     dataset = pydicom.dcmread(file)
     try:
         uid = dataset.SOPInstanceUID

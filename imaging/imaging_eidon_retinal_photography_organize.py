@@ -15,8 +15,8 @@ def filter_eidon_files(file, outputfolder):
         outputfolder (str): The directory where the processed files will be stored.
 
     Returns:
-        dict: A dictionary containing information about the processed file, including rule, patient ID, 
-        patient name, laterality, rows, columns, SOP instance UID, series instance UID, filename, 
+        dict: A dictionary containing information about the processed file, including rule, patient ID,
+        patient name, laterality, rows, columns, SOP instance UID, series instance UID, filename,
         original file path, and any errors encountered.
     """
 

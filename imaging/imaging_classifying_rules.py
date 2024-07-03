@@ -1,13 +1,14 @@
 import os
 import pydicom
 
+
 # Class representing a rule for classifying DICOM entries
 class ClassifyingRule:
     """
     Represents a classification rule for processing DICOM entries.
 
     This class defines a rule used for classifying DICOM entries based on specific conditions.
-    It contains attributes such as the rule's name and a list of conditions that must be met 
+    It contains attributes such as the rule's name and a list of conditions that must be met
     for the rule to apply.
 
     Attributes:
@@ -17,6 +18,7 @@ class ClassifyingRule:
     Methods:
         apply(dicom_entry): Checks if the DICOM entry meets all conditions.
     """
+
     def __init__(self, name, conditions):
         self.name = name
         self.conditions = conditions
@@ -27,6 +29,7 @@ class ClassifyingRule:
             if not condition(dicom_entry):
                 return False
         return True
+
 
 # List of classification rules
 rules = [
@@ -331,6 +334,7 @@ rules = [
     ),
 ]
 
+
 # Class representing a DICOM entry
 class DicomEntry:
     """
@@ -362,6 +366,7 @@ class DicomEntry:
         error (str): Error information.
         name (str): The name of the patient.
     """
+
     def __init__(
         self,
         filename,
@@ -408,6 +413,7 @@ class DicomEntry:
         self.error = error
         self.name = name
 
+
 # Class representing a summary of a DICOM entry
 class DicomSummary:
     """
@@ -424,6 +430,7 @@ class DicomSummary:
         acquisitiondatetime (str): The acquisition date and time.
         sopinstanceuid (str): The SOP instance UID.
     """
+
     def __init__(
         self,
         filename,
@@ -439,6 +446,7 @@ class DicomSummary:
         self.description = description  # belongs to which one in AIREADI checklist
         self.acquitisiondatetime = acquisitiondatetime
         self.sopinstanceuid = sopinstanceuid
+
 
 # Function to extract information from a DICOM file and create a DicomEntry object
 def extract_dicom_entry(file):
@@ -502,7 +510,7 @@ def extract_dicom_entry(file):
         referencedsopinstance
     ) = gaze = "N/A"
 
-     # Extract specific attributes based on SOP Class UID
+    # Extract specific attributes based on SOP Class UID
     if "00200062" in dicom and "Value" in dicom["00200062"]:
         laterality = dicom["00200062"]["Value"][0]
     elif "00200060" in dicom and "Value" in dicom["00200060"]:
@@ -617,7 +625,7 @@ def extract_dicom_entry(file):
     return output
 
 
-## Domain, Modality, Protocol, Patient ID, Laterlity, sopinstanceuid, referencedsopinstance
+# Domain, Modality, Protocol, Patient ID, Laterlity, sopinstanceuid, referencedsopinstance
 def extract_dicom_summary(file):
     """
     Extract a summary from a DICOM file.

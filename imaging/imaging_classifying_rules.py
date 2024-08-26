@@ -447,7 +447,6 @@ class DicomSummary:
         self.acquitisiondatetime = acquisitiondatetime
         self.sopinstanceuid = sopinstanceuid
 
-
 # Function to extract information from a DICOM file and create a DicomEntry object
 def extract_dicom_entry(file):
     """
@@ -464,6 +463,7 @@ def extract_dicom_entry(file):
 
     dicom = pydicom.dcmread(file).to_json_dict()
     ds = pydicom.dcmread(file)
+    
     filename = os.path.basename(file)
     bottom_file_name = os.path.basename(file)
     directory_one_level_up = os.path.dirname(file)

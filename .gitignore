@@ -1,5 +1,7 @@
 datafolder/
 .env/
+.testenv/
 __pycache__/
 *.ipynb_checkpoints/
 .DS_Store/
+file_map.json/

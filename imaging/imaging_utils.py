@@ -4,6 +4,7 @@ import shutil
 import pydicom
 import zipfile
 import importlib.util
+import string
 
 
 def extract_numeric_part(uid):
@@ -31,7 +32,9 @@ def list_zip_files(directory):
         list: A list of file paths for each zip file found in the directory.
     """
     zip_files = [
-        os.path.join(directory, f) for f in os.listdir(directory) if f.endswith(".zip")
+        os.path.join(directory, f)
+        for f in os.listdir(directory)
+        if f.endswith(".zip") and f[0].lower() in string.ascii_lowercase
     ]
     return zip_files
 
@@ -82,6 +85,24 @@ def unzip_fda_file(input_zip_path, output_folder_path):
         # Unzip the contents of the zip file into the output folder
         with zipfile.ZipFile(input_zip_path, "r") as zip_ref:
             zip_ref.extractall(triton)
+        dic = {"Foldername": f"{input_zip_path}", "unzipping": "correct"}
+        print(dic)
+        return dic
+
+    elif "cirrus" in input_zip_path.lower():
+        # Create the output folder if it doesn't exist
+        cirrus = f"{output_folder_path}/Cirrus/{input_name}"
+        os.makedirs(cirrus, exist_ok=True)
+
+        # Unzip the contents of the zip file into the output folder
+        with zipfile.ZipFile(input_zip_path, "r") as zip_ref:
+            zip_ref.extractall(cirrus)
+
+        for root, dirs, files in os.walk(cirrus):
+            for file in files:
+                if not file.lower().endswith(".dcm"):
+                    os.remove(os.path.join(root, file))
+
         dic = {"Foldername": f"{input_zip_path}", "unzipping": "correct"}
         print(dic)
         return dic
@@ -184,6 +205,105 @@ def check_files_in_folder(folder_path, file_names):
     return True
 
 
+def filter_flio_files_process(input, output):
+    """
+    Filters and processes FLIO (Fluorescence Lifetime Imaging Ophthalmoscopy) files from the input directory and copies them to an output directory.
+
+    This function navigates through subdirectories in the input folder, identifies folders containing the necessary FLIO files
+    ("Measurement.sdt" and "measurement_info.html"), and copies these folders to the output directory with a modified folder name.
+    If any required files are missing, a message is printed indicating the missing file and its folder path.
+
+    Args:
+        input (str): The full path to the input directory containing subfolders of FLIO files.
+        output (str): The full path to the output directory where processed FLIO files will be copied.
+
+    Returns:
+        None
+
+    """
+    pts = list_subfolders(input)
+    for pt in pts:
+        laterality = list_subfolders(pt)
+        for one in laterality:
+            folder_path = one
+            if check_files_in_folder(
+                folder_path, ["Measurement.sdt", "measurement_info.html"]
+            ):
+                patient = pt.split("/")[-1]
+                side = one.split("/")[-1]
+
+                outputpath = f"{output}/flio_{patient}_{side}"
+                shutil.copytree(folder_path, outputpath)
+            else:
+                print("missing file", folder_path)
+
+
+def get_filtered_all_file_names(folder_path):
+    """
+    Retrieves a list of all file paths in a directory, excluding those with names starting with '._'.
+
+    This function walks through all subdirectories of the specified folder and collects the full paths
+    of files, excluding any files whose names start with '._' (often used for metadata or system files on some systems).
+
+    Args:
+        folder_path (str): The full path to the directory to search for files.
+
+    Returns:
+        list: A list of strings, where each string is the full path to a file that does not start with '._'.
+    """
+    filtered_files = []
+    for root, dirs, files in os.walk(folder_path):
+        for file in files:
+            full_path = os.path.join(root, file)
+            if not full_path.split("/")[-1].startswith("._"):
+                filtered_files.append(full_path)
+    return filtered_files
+
+
+def find_html_sdt_files(folder_path):
+    """
+    Finds and returns the paths of the HTML and SDT files within a specified folder.
+
+    This function searches through all files in the given folder, identifying one HTML file and one SDT file.
+    If multiple HTML or SDT files are found, or if either file type is missing, the function raises a ValueError.
+
+    Args:
+        folder_path (str): The full path to the folder to search for HTML and SDT files.
+
+    Returns:
+        tuple: A tuple containing two elements:
+            - sdt_file (str): The full path to the found SDT file.
+            - html_file (str): The full path to the found HTML file.
+
+    Raises:
+        ValueError: If multiple HTML files or multiple SDT files are found.
+        ValueError: If either the HTML file or the SDT file is not found in the folder.
+
+    """
+    html_file = None
+    sdt_file = None
+
+    # List all files in the folder
+    files = get_filtered_all_file_names(folder_path)
+
+    # Check for HTML and SDT files
+    for file in files:
+        if file.endswith(".html"):
+            if html_file is not None:
+                raise ValueError("Multiple HTML files found")
+            html_file = os.path.join(folder_path, file)
+        elif file.endswith(".sdt"):
+            if sdt_file is not None:
+                raise ValueError("Multiple SDT files found")
+            sdt_file = os.path.join(folder_path, file)
+
+    # Ensure both HTML and SDT files are found
+    if html_file is None or sdt_file is None:
+        raise ValueError("Both HTML and SDT files are required")
+
+    return sdt_file, html_file
+
+
 def topcon_check_files_expected(folder_path):
     """
     Check if a folder contains the expected number of specific files for Topcon devices.
@@ -217,6 +337,32 @@ def topcon_check_files_expected(folder_path):
     # Check if files match expected patterns
 
     if (files_count_9 == 2) or (files_count_9 == 9):
+        return "Expected"
+    else:
+        return "Unknown"
+
+
+def cirrus_check_files_expected(folder_path):
+    """
+    Check if a folder contains the expected number of specific files for Cirrus devices.
+
+    Args:
+        folder_path (str): The path to the folder.
+
+    Returns:
+        str: "Expected" if the files match the expected patterns, otherwise "Unknown".
+    """
+
+    files_count = 0
+
+    for root, dirs, files in os.walk(folder_path):
+        for file in files:
+            if file.endswith((".dcm",)) and file.startswith("AIREADI"):
+                files_count += 1
+
+    # Check if files match expected patterns
+
+    if (files_count == 7) or (files_count == 15):
         return "Expected"
     else:
         return "Unknown"
@@ -638,13 +784,7 @@ def format_file(file, output):
 
             dataset.save_as(full_file_path)
 
-            dic = {
-                "Protocol": protocol,
-                "PatientID": dataset.PatientID,
-                "Laterality": dataset.ImageLaterality,
-            }
-
-            return dic
+            return full_file_path
 
 
 def update_pydicom_dicom_dictionary(file_path):

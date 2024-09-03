@@ -1,6 +1,7 @@
 from imaging_standards import DataDomain
 import imaging_flio_converter as flio_conv
 import imaging_flio_organize as flio_organize
+import imaging_flio_metadata as flio_meta
 import imaging_utils
 
 # import imaging.flio_retinal_photography_metadata as flio_meta
@@ -61,3 +62,19 @@ class Flio(DataDomain):
         conv_dict = flio_conv.convert_dicom(input_dicom, output)
 
         return conv_dict
+
+    def metadata(self, input_file, output_folder):
+        """
+        Extracts metadata from the input file and saves it as a JSON file in the output folder.
+
+        Args:
+            input_file (str): Full path to the DICOM *.dcm file.
+            output_folder (str): Full path to the folder where the output metadata JSON file will be saved.
+
+        Returns:
+            dict: A dictionary containing extracted metadata.
+        """
+
+        meta_dict = flio_meta.meta_data_save(input_file, output_folder)
+
+        return meta_dict

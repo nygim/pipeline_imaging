@@ -183,7 +183,9 @@ def meta_data_save(filename, output_folder):
 
         json_data = {filename: dic}
 
-        with open(f"{output_folder}/{filename}.json", "w") as json_file:
+        os.makedirs(f"{output_folder}/retinal_photography", exist_ok=True)
+
+        with open(f"{output_folder}/retinal_photography/{filename}.json", "w") as json_file:
             json.dump(json_data, json_file)
 
         print(json_data)
@@ -255,7 +257,9 @@ def meta_data_save(filename, output_folder):
 
         json_data = {filename: dic}
 
-        with open(f"{output_folder}/{filename}.json", "w") as json_file:
+        os.makedirs(f"{output_folder}/retinal_oct", exist_ok=True)
+
+        with open(f"{output_folder}/retinal_oct/{filename}.json", "w") as json_file:
             json.dump(json_data, json_file)
 
         print(json_data)

@@ -57,7 +57,7 @@ def filter_optomed_files(file, outputfolder):
     else:
         filename = file.split("/")[-1]
         error = "Invalid_dicom"
-    
+
         original_path = file
         output_path = f"{outputfolder}/{error}/{error}_{filename}"
         os.makedirs(os.path.dirname(output_path), exist_ok=True)

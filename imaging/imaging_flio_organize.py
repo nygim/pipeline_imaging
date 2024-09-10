@@ -19,13 +19,16 @@ def filter_flio_files_process(input, output):
         laterality = imaging_utils.list_subfolders(pt)
         for one in laterality:
             folder_path = one
+
             if imaging_utils.check_files_in_folder(
                 folder_path, ["Measurement.sdt", "measurement_info.html"]
             ):
+
                 patient = pt.split("/")[-1]
                 side = one.split("/")[-1]
 
                 outputpath = f"{output}/flio_{patient}_{side}"
+
                 os.makedirs(os.path.dirname(outputpath), exist_ok=True)
                 shutil.copytree(folder_path, outputpath, dirs_exist_ok=True)
 
@@ -38,6 +41,7 @@ def filter_flio_files_process(input, output):
                 print(dic)
 
             else:
+
                 dic = {
                     "Input batch folder": input,
                     "Output folder": outputpath.split("/")[-1],

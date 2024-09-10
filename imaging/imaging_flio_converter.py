@@ -512,10 +512,16 @@ def make_flio_dicom(inputsdt, inputhtml, output, json_path):
     a.file_meta.MediaStorageSOPInstanceUID = uid_short
 
     a.SOPInstanceUID = uid_short
+    a.StudyInstanceUID = uid_short
+    a.SeriesInstanceUID = uid_short
+    a.SynchronizationFrameOfReferenceUID = uid_short
 
     b.file_meta.MediaStorageSOPInstanceUID = uid_long
 
     b.SOPInstanceUID = uid_long
+    b.StudyInstanceUID = uid_long
+    b.SeriesInstanceUID = uid_long
+    b.SynchronizationFrameOfReferenceUID = uid_long
 
     patientid = dicom_info["PatientID"][-4:]
     laterality = dicom_info["Laterality"].lower()
@@ -675,19 +681,19 @@ flio = ConversionRule(
         Element("ReferringPhysicianName", "00080090", "PN", BLANK),
         Element("StudyID", "00200010", "SH", BLANK),
         Element("AccessionNumber", "00080050", "SH", BLANK),
-        Element("Modality", "00080060", "CS"),
+        Element("Modality", "00080060", "CS", HARMONIZE, "FLIO"),
         Element("SeriesInstanceUID", "0020000E", "UI"),
         Element("SeriesNumber", "00200011", "IS"),
         Element("SynchronizationFrameOfReferenceUID", "00200200", "UI"),
-        Element("SynchronizationTrigger", "0018106A", "CS"),
-        Element("AcquisitionTimeSynchronized", "00181800", "CS"),
+        Element("SynchronizationTrigger", "0018106A", "CS", HARMONIZE, "NO TRIGGER"),
+        Element("AcquisitionTimeSynchronized", "00181800", "CS", HARMONIZE, "NO"),
         Element("Manufacturer", "00080070", "LO"),
         Element("ManufacturerModelName", "00081090", "LO"),
         Element("DeviceSerialNumber", "00181000", "LO"),
         Element("SoftwareVersions", "00181020", "LO"),
         Element("InstanceNumber", "00200013", "IS", HARMONIZE, "1"),
         Element("PatientOrientation", "00200020", "CS"),
-        Element("BurnedInAnnotation", "00280301", "CS"),
+        Element("BurnedInAnnotation", "00280301", "CS", HARMONIZE, "NO"),
         Element("StudyDescription", "00081030", "LO"),
         Element("SamplesPerPixel", "00280002", "US"),
         Element("PhotometricInterpretation", "00280004", "CS"),
@@ -695,30 +701,41 @@ flio = ConversionRule(
         Element("Columns", "00280011", "US"),
         Element("BitsAllocated", "00280100", "US"),
         Element("BitsStored", "00280101", "US"),
-        Element("HighBit", "00280102", "US"),
+        Element("HighBit", "00280102", "US", HARMONIZE, 15),
         Element("PixelRepresentation", "00280103", "US"),
         Element("PlanarConfiguration", "00280006", "US"),
+        Element("FrameTime", "00181063", "DS", HARMONIZE, "0.0000125"),
+        Element("FrameTimeVector", "00181063", "DS", HARMONIZE, "0.0000125"),
+        Element("StartTrim", "00082142", "IS", HARMONIZE, "1"),
+        Element("StopTrim", "00082143", "IS", HARMONIZE, "1024"),
         Element("NumberOfFrames", "00280008", "IS"),
-        Element("FrameIncrementPointer", "00280009", "AT"),
-        Element("FrameTime", "00181063", "DS", HARMONIZE, "0.0"),
+        Element("FrameIncrementPointer", "00280009", "AT", HARMONIZE, "00181063"),
         Element("ImageType", "00080008", "CS"),
         Element("PixelSpacing", "00280030", "DS"),
         Element("ContentTime", "00080033", "TM"),
         Element("ContentDate", "00080023", "DA"),
         Element("AcquisitionDateTime", "0008002A", "DT"),
-        Element("LossyImageCompression", "00282110", "CS"),
+        Element("LossyImageCompression", "00282110", "CS", HARMONIZE, "NO"),
         Element("LossyImageCompressionRatio", "00282112", "DS"),
         Element("LossyImageCompressionMethod", "00282114", "CS"),
+        Element("PresentationLUTShape", "20500020", "CS", HARMONIZE, "IDENTITY"),
+        Element("BurnedInAnnotation", "00280301", "CS", HARMONIZE, "NO"),
         Element("ImageLaterality", "00200062", "CS"),
-        Element("PatientEyeMovementCommanded", "00220005", "CS"),
+        Element("PatientEyeMovementCommanded", "00220005", "CS", HARMONIZE, "NO"),
         Element("EmmetropicMagnification", "0022000A", "FL"),
         Element("IntraOcularPressure", "0022000B", "FL"),
         Element("HorizontalFieldOfView", "0022000C", "FL"),
-        Element("PupilDilated", "0022000D", "CS", HARMONIZE, "NO"),
+        Element("PupilDilated", "0022000D", "CS", HARMONIZE, "YES"),
         Element("DetectorType", "00187004", "CS"),
-        Element("SOPClassUID", "00080016", "UI"),
+        Element(
+            "SOPClassUID",
+            "00080016",
+            "UI",
+            HARMONIZE,
+            "1.2.840.10008.5.1.4.1.1.77.1.5.2",
+        ),
         Element("SOPInstanceUID", "00080018", "UI"),
-        Element("SpecificCharacterSet", "00080005", "CS"),
+        Element("SpecificCharacterSet", "00080005", "CS", HARMONIZE, "ISO_IR 192"),
         Element("LightPathFilterPass-ThroughWavelgnth", "00220001", "US"),
         Element("LightPathFilterPassBand", "00220002", "US"),
         Element("ImagePathFilterPass-ThroughWavelength", "00220003", "US"),
@@ -745,9 +762,9 @@ flio = ConversionRule(
             "00220016",
             "SQ",
             [
-                Element("CodeValue", "00080100", "SH"),
-                Element("CodingSchemeDesignator", "00080102", "SH"),
-                Element("CodeMeaning", "00080104", "LO"),
+                Element("CodeValue", "00080100", "SH", HARMONIZE, "xxxx2"),
+                Element("CodingSchemeDesignator", "00080102", "SH", HARMONIZE, "DCM"),
+                Element("CodeMeaning", "00080104", "LO", HARMONIZE, "Shortpulselaser"),
             ],
         ),
         ElementList(
@@ -765,9 +782,9 @@ flio = ConversionRule(
             "00220015",
             "SQ",
             [
-                Element("CodeValue", "00080100", "SH", HARMONIZE, "409898007"),
-                Element("CodingSchemeDesignator", "00080102", "SH", HARMONIZE, "SCT"),
-                Element("CodeMeaning", "00080104", "LO", HARMONIZE, "Fundus Camera"),
+                Element("CodeValue", "00080100", "SH", HARMONIZE, "xxxx1"),
+                Element("CodingSchemeDesignator", "00080102", "SH", HARMONIZE, "DCM"),
+                Element("CodeMeaning", "00080104", "LO", HARMONIZE, "FLIO"),
             ],
         ),
     ],
@@ -867,7 +884,17 @@ def extract_dicom_dict(file, tags):
     dataset = pydicom.dcmread(file)
 
     dataset.PatientOrientation = ["L", "F"]
-    dataset.ImageType = ["ORIGINAL", "PRIMARY", "", "COLOR"]
+    dataset.StudyDate = dataset.ContentDate
+    dataset.StudyTime = dataset.ContentTime
+    dataset.SoftwareVersions = dataset["00731004"].value
+    dataset.ImageType = ["ORIGINAL", "PRIMARY"]
+    dataset.AcquisitionDateTime = str(dataset.ContentDate) + str(dataset.ContentTime)
+
+    if "short" in file:
+        dataset.ImagePathFilterPassBand = 498, 560
+
+    else:
+        dataset.LightPathFilterPassBand = 560, 720
 
     header_elements = {
         "00020000": {

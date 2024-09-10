@@ -1,6 +1,7 @@
 import os
 import imaging_utils
 import imaging_classifying_rules
+import pydicom
 
 
 def filter_maestro2_triton_files(folder, output):
@@ -24,7 +25,9 @@ def filter_maestro2_triton_files(folder, output):
             - "Foldername" (str): The name of the folder processed.
     """
     filtered_list = imaging_utils.get_filtered_file_names(folder)
-    all_dicom = all(imaging_classifying_rules.is_dicom_file(file) for file in filtered_list)
+    all_dicom = all(
+        imaging_classifying_rules.is_dicom_file(file) for file in filtered_list
+    )
 
     if all_dicom:
 
@@ -45,20 +48,37 @@ def filter_maestro2_triton_files(folder, output):
                         if file.endswith("1.1.dcm") and file.startswith("2"):
                             file_path = os.path.join(root, file)
                             protocol = imaging_classifying_rules.find_rule(file_path)
-                            imaging_utils.topcon_process_folder(folder, output, protocol)
+                            a = pydicom.dcmread(file_path)
+                            patient_id = a.PatientID
+                            laterality = a.ImageLaterality
+                            imaging_utils.topcon_process_folder(
+                                folder, output, protocol
+                            )
 
         else:
             protocol = f"{check}"
 
             imaging_utils.topcon_process_folder(folder, output, protocol)
 
-        dic = {"Protocol": protocol, "Foldername": folder}
+        dic = {
+            "Rule": protocol,
+            "Patient ID": patient_id,
+            "Laterality": laterality,
+            "Input": folder,
+            "Output": output,
+        }
         print(dic)
-    
+
     else:
         protocol = "invalid_dicom"
         imaging_utils.topcon_process_folder(folder, output, protocol)
-        dic = {"Protocol": protocol, "Foldername": folder}
-        print(dic)      
+        dic = {
+            "Rule": protocol,
+            "Patient ID": "N/A",
+            "Laterality": "N/A",
+            "Input": folder,
+            "Output": output,
+        }
+        print(dic)
 
     return dic

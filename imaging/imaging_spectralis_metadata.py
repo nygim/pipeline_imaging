@@ -164,6 +164,7 @@ def meta_data_save(filename, output_folder):
         height = str(dataset.Rows)
         width = str(dataset.Columns)
         sop_instance_uid = dataset.SOPInstanceUID
+        rule = dataset.ProtocolName
 
         dic = {
             "participant_id": patient_id,
@@ -177,6 +178,9 @@ def meta_data_save(filename, output_folder):
             "color_channel_dimension": color_channel_dimension,
             "filepath": file,
             "sop_instance_uid": sop_instance_uid,
+            "protocol": rule,
+            "content_time": dataset.ContentDate + dataset.ContentTime,
+            "sop_class_uid": dataset.SOPClassUID,
         }
 
         filename = file.split("/")[-1].replace(".", "_")
@@ -185,7 +189,9 @@ def meta_data_save(filename, output_folder):
 
         os.makedirs(f"{output_folder}/retinal_photography", exist_ok=True)
 
-        with open(f"{output_folder}/retinal_photography/{filename}.json", "w") as json_file:
+        with open(
+            f"{output_folder}/retinal_photography/{filename}.json", "w"
+        ) as json_file:
             json.dump(json_data, json_file)
 
         print(json_data)
@@ -251,6 +257,9 @@ def meta_data_save(filename, output_folder):
             "filepath": file,
             "sop_instance_uid": sop_instance_uid,
             "reference_retinal_photography_image_instance_uid": reference_instance_uid,
+            "protocol": rule,
+            "content_time": dataset.ContentDate + dataset.ContentTime,
+            "sop_class_uid": dataset.SOPClassUID,
         }
 
         filename = file.split("/")[-1].replace(".", "_")

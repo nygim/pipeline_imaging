@@ -6,6 +6,7 @@ from maestro2_triton_enface_converter_functional_groups import (
     enface_volume_descriptor_sequence,
     referenced_series_sequence,
     ophthalmic_image_type_code_sequence,
+    ophthalmic_frame_location_sequence,
 )
 import imaging_classifying_rules
 
@@ -359,6 +360,7 @@ def extract_dicom_dict(file, tags):
 
     dataset = pydicom.dcmread(file)
     dataset.PatientOrientation = ["L", "F"]
+    dataset.ImageOrientation = [-1.0, 0.0, 0.0, 0.0, 0.0, 1.0]
 
     header_elements = {
         "00020000": {
@@ -408,7 +410,7 @@ def extract_dicom_dict(file, tags):
     return output, transfersyntax, pixel_data
 
 
-def write_dicom(protocol, dicom_dict_list, seg, vol, opt, op, file_path):
+def write_dicom(protocol, dicom_dict_list, seg, vol, opt, op, opt_file, file_path):
     """
     Writes a DICOM file based on a specified protocol and input data.
 
@@ -546,12 +548,13 @@ def write_dicom(protocol, dicom_dict_list, seg, vol, opt, op, file_path):
         referenced_series_sequence(dataset, dicom_dict_list, seg, vol, opt, op)
         derivation_algorithm_sequence(dataset, dicom_dict_list)
         enface_volume_descriptor_sequence(dataset, dicom_dict_list, seg)
+        ophthalmic_frame_location_sequence(dataset, dicom_dict_list, opt_file)
 
     pydicom.filewriter.write_file(file_path, dataset, write_like_original=False)
 
 
 def convert_dicom(
-    inputenface, inputseg, inputvol, inputopt, inputop, output
+    inputenface, inputseg, inputvol, inputop, inputopt, output
 ):  # inputseg, inputoct, inputop,
     """
     Convert DICOM data using a specific conversion rule.
@@ -581,6 +584,7 @@ def convert_dicom(
             "00660031",
             "00081115",
             "00221615",
+            "00220031",
         ]
     )
     enf = extract_dicom_dict(inputenface, tags)
@@ -592,5 +596,12 @@ def convert_dicom(
     filename = inputenface.split("/")[-1]
 
     write_dicom(
-        conversion_rule, enf, seg, vol, opt, op, f"{output}/converted_{filename}"
+        conversion_rule,
+        enf,
+        seg,
+        vol,
+        opt,
+        op,
+        inputopt,
+        f"{output}/converted_{filename}",
     )

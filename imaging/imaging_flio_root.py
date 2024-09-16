@@ -43,8 +43,8 @@ class Flio(DataDomain):
         Returns:
             dict: Information on conversion issues and output files.
         """
-        sdt, html = imaging_utils.find_html_sdt_files(input_folder)
-        conv_dict = flio_conv.make_flio_dicom(sdt, html, output, jsonpath)
+
+        conv_dict = flio_conv.make_flio_dicom(input_folder, output, jsonpath)
 
         return conv_dict
 

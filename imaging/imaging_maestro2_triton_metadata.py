@@ -168,6 +168,7 @@ def meta_data_save(filename, output_folder):
 
         dic = {
             "participant_id": patient_id,
+            "filepath": file,
             "manufacturer": manufacturer,
             "manufacturers_model_name": device,
             "laterality": laterality,
@@ -176,7 +177,6 @@ def meta_data_save(filename, output_folder):
             "height": height,
             "width": width,
             "color_channel_dimension": color_channel_dimension,
-            "filepath": file,
             "sop_instance_uid": sop_instance_uid,
             "protocol": rule,
             "content_time": dataset.ContentDate + dataset.ContentTime,
@@ -193,8 +193,6 @@ def meta_data_save(filename, output_folder):
             f"{output_folder}/retinal_photography/{filename}.json", "w"
         ) as json_file:
             json.dump(json_data, json_file)
-
-        print(json_data)
 
         return dic
 
@@ -244,6 +242,7 @@ def meta_data_save(filename, output_folder):
 
         dic = {
             "participant_id": patient_id,
+            "filepath": file,
             "manufacturer": manufacturer,
             "manufacturers_model_name": device,
             "anatomic_region": anatomic_region,
@@ -254,7 +253,6 @@ def meta_data_save(filename, output_folder):
             "number_of_frames": number_of_frames,
             "pixel_spacing": pixel_spacing,
             "slice_thickness": slice_thickness,
-            "filepath": file,
             "sop_instance_uid": sop_instance_uid,
             "reference_retinal_photography_image_instance_uid": reference_instance_uid,
             "protocol": dataset.ProtocolName,
@@ -270,8 +268,6 @@ def meta_data_save(filename, output_folder):
 
         with open(f"{output_folder}/retinal_oct/{filename}.json", "w") as json_file:
             json.dump(json_data, json_file)
-
-        print(json_data)
 
         return dic
 
@@ -320,18 +316,18 @@ def meta_data_save(filename, output_folder):
         sop_instance_uid = dataset.SOPInstanceUID
 
         dic = {
+            "participant_id": patient_id,
             "filepath": file,
-            "patient id": patient_id,
             "modality": modality,
             "submodality": sub_modality,
             "manufacturer": manufacturer,
-            "device": device,
+            "manufacturers_model_name": device,
             "laterality": laterality,
             "protocol": protocol,
             "height": height,
             "width": width,
-            "number of frames": number_of_frames,
-            "sop instance uid": sop_instance_uid,
+            "number_of_frames": number_of_frames,
+            "sop_instance_uid": sop_instance_uid,
             "content_time": dataset.ContentDate + dataset.ContentTime,
             "sop_class_uid": dataset.SOPClassUID,
         }
@@ -343,8 +339,6 @@ def meta_data_save(filename, output_folder):
 
         with open(f"{output_folder}/retinal_octa/{filename}.json", "w") as json_file:
             json.dump(json_data, json_file)
-
-        print(json_data)
 
         return dic
 
@@ -393,21 +387,21 @@ def meta_data_save(filename, output_folder):
         sop_instance_uid = dataset.SOPInstanceUID
 
         dic = {
+            "participant_id": patient_id,
             "filepath": file,
-            "patient id": patient_id,
             "modality": modality,
             "submodality": sub_modality,
             "manufacturer": manufacturer,
-            "device": device,
+            "manufacturers_model_name": device,
             "laterality": laterality,
             "protocol": protocol,
             "height": height,
             "width": width,
-            "number of frames": number_of_frames,
-            "sop instance uid": sop_instance_uid,
-            "segmentation type": "Heightmap",
-            "content time": dataset.ContentDate + dataset.ContentTime,
-            "sop class uid": dataset.SOPClassUID,
+            "number_of_frames": number_of_frames,
+            "sop_instance_uid": sop_instance_uid,
+            "segmentation_type": "Heightmap",
+            "content_time": dataset.ContentDate + dataset.ContentTime,
+            "sop_class_uid": dataset.SOPClassUID,
         }
 
         filename = file.split("/")[-1].replace(".", "_")
@@ -418,8 +412,6 @@ def meta_data_save(filename, output_folder):
 
         with open(f"{output_folder}/retinal_octa/{filename}.json", "w") as json_file:
             json.dump(json_data, json_file)
-
-        print(json_data)
 
         return dic
 
@@ -483,23 +475,66 @@ def meta_data_save(filename, output_folder):
                 "00080104"
             ].value
 
+        oct_reference_instance_uid = ""
+        op_reference_instance_uid = ""
+        vol_reference_instance_uid = ""
+        seg_reference_instance_uid = ""
+
+        for i in range(len(dataset["00081115"].value)):
+
+            if (
+                dataset["00081115"][i]["0008114A"][0]["00081150"].value
+                == "1.2.840.10008.5.1.4.1.1.77.1.5.4"
+            ):
+                oct_reference_instance_uid = dataset["00081115"][i]["0008114A"][0][
+                    "00081155"
+                ].value
+
+            elif (
+                dataset["00081115"][i]["0008114A"][0]["00081150"].value
+                == "1.2.840.10008.5.1.4.1.1.77.1.5.1"
+            ):
+                op_reference_instance_uid = dataset["00081115"][i]["0008114A"][0][
+                    "00081155"
+                ].value
+
+            elif (
+                dataset["00081115"][i]["0008114A"][0]["00081150"].value
+                == "1.2.840.10008.5.1.4.1.1.77.1.5.8"
+            ):
+                vol_reference_instance_uid = dataset["00081115"][i]["0008114A"][0][
+                    "00081155"
+                ].value
+
+            elif (
+                dataset["00081115"][i]["0008114A"][0]["00081150"].value
+                == "1.2.840.10008.5.1.4.xxxxx.1"
+            ):
+                seg_reference_instance_uid = dataset["00081115"][i]["0008114A"][0][
+                    "00081155"
+                ].value
+
         dic = {
+            "participant_id": patient_id,
             "filepath": file,
-            "Patient ID": patient_id,
-            "Modality": modality,
-            "Submodality": sub_modality,
-            "Manufacturer": manufacturer,
-            "Device": device,
-            "Laterality": laterality,
-            "Protocol": protocol,
-            "Height": height,
-            "Width": width,
+            "modality": modality,
+            "submodality": sub_modality,
+            "manufacturer": manufacturer,
+            "manufacturers_model_name": device,
+            "laterality": laterality,
+            "protocol": protocol,
+            "height": height,
+            "width": width,
             "sop_instance_uid": sop_instance_uid,
-            "Ophthalmic_image_type": ophthalmic_image_type,
-            "En Face Retinal Segmentation Surface 1": str(layer1).lower(),
-            "En Face Retinal Segmentation Surface 2": str(layer2).lower(),
-            "content time": dataset.ContentDate + dataset.ContentTime,
-            "sop class uid": dataset.SOPClassUID,
+            "ophthalmic_image_type": ophthalmic_image_type,
+            "en_face_retinal_segmentation_surface_1": str(layer1).lower(),
+            "en_face_retinal_segmentation_surface_2": str(layer2).lower(),
+            "content_time": dataset.ContentDate + dataset.ContentTime,
+            "sop_class_uid": dataset.SOPClassUID,
+            "oct_reference_instance_uid": oct_reference_instance_uid,
+            "op_reference_instance_uid": op_reference_instance_uid,
+            "vol_reference_instance_uid": vol_reference_instance_uid,
+            "seg_reference_instance_uid": seg_reference_instance_uid,
         }
 
         filename = file.split("/")[-1].replace(".", "_")
@@ -510,7 +545,5 @@ def meta_data_save(filename, output_folder):
 
         with open(f"{output_folder}/retinal_octa/{filename}.json", "w") as json_file:
             json.dump(json_data, json_file)
-
-        print(json_data)
 
         return dic

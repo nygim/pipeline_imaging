@@ -318,6 +318,7 @@ def extract_dicom_dict(file, tags):
     output["filepath"] = file
 
     dataset = pydicom.dcmread(file)
+
     dataset.PatientOrientation = ["L", "F"]
 
     if "visible" in file:
@@ -338,7 +339,10 @@ def extract_dicom_dict(file, tags):
             "vr": "OB",
             "Value": [dataset.file_meta.FileMetaInformationVersion],
         },
-        "00020002": {"vr": "UI", "Value": [dataset.file_meta.MediaStorageSOPClassUID]},
+        "00020002": {
+            "vr": "UI",
+            "Value": [dataset.file_meta.MediaStorageSOPInstanceUID],
+        },
         "00020003": {
             "vr": "UI",
             "Value": [dataset.file_meta.MediaStorageSOPInstanceUID],
@@ -377,8 +381,8 @@ def extract_dicom_dict(file, tags):
     modified_uid = (
         seriesinstanceuid[:last_dot_index] + seriesinstanceuid[last_dot_index + 1 :]
     )
-
     info["0020000E"]["Value"] = str(modified_uid)
+
     json_dict.update(info)
     dicom = json_dict
     output = process_tags(tags, dicom)
@@ -522,17 +526,18 @@ def convert_dicom(input, output):
     )
     x = extract_dicom_dict(input, tags)
     filename = input.split("/")[-1]
-
-    write_dicom(conversion_rule, x, f"{output}/converted_{filename}")
-
     b = imaging_classifying_rules.extract_dicom_entry(input)
     rule = imaging_classifying_rules.find_rule(input)
+
+    convert = "no"
+    write_dicom(conversion_rule, x, f"{output}/converted_{filename}")
+    convert = "yes"
+
     dic = {
         "Rule": rule,
-        "PatientID": b.patientid,
-        "Laterality": b.laterality,
-        "Rows": b.rows,
-        "Columns": b.columns,
+        "Converted": convert,
+        "Input": input,
+        "Output": f"{output}/converted_{filename}",
     }
-    print(dic)
+
     return dic

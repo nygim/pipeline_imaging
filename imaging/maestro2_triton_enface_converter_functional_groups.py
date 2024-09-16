@@ -394,15 +394,16 @@ def get_reference_coordinates(oct_file):
     return final_coordinates
 
 
-def ophthalmic_frame_location_sequence(dataset, x, opt):
+def ophthalmic_frame_location_sequence(dataset, x, opt, op):
     """ """
+    b = pydicom.dcmread(op)
     a = pydicom.dcmread(opt)
 
     ophthalmic_image_type_code_seq = pydicom.Sequence()
     ophthalmic_image_type_code_item = pydicom.Dataset()
 
-    ophthalmic_image_type_code_item.ReferencedSOPClassUID = a.SOPClassUID
-    ophthalmic_image_type_code_item.ReferencedSOPInstanceUID = a.SOPInstanceUID
+    ophthalmic_image_type_code_item.ReferencedSOPClassUID = b.SOPClassUID
+    ophthalmic_image_type_code_item.ReferencedSOPInstanceUID = b.SOPInstanceUID
     ophthalmic_image_type_code_item.ReferenceCoordinates = get_reference_coordinates(
         opt
     )

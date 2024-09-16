@@ -76,5 +76,4 @@ def convert_dicom(folder, output):
         "Correct number of conversion ": boolean,
     }
 
-    print(dic)
     return dic

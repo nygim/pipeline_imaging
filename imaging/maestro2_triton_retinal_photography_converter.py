@@ -331,17 +331,13 @@ def extract_dicom_dict(file, tags):
 
     dataset = pydicom.dcmread(file)
 
-    if "maestro2_mac_6x6_octa" in file:
-        dataset.ImageType = ["ORIGINAL", "PRIMARY", "", "INFRARED"]
-
-    else:
+    if "PixelSpacing" in dataset:
         dataset.ImageType = ["ORIGINAL", "PRIMARY", "", "COLOR"]
-
-    if "maestro2_mac_6x6_octa" in file:
-        dataset.PixelSpacing = [0.006868132, 0.006868132]
+        dataset.PixelSpacing = dataset.PixelSpacing
 
     else:
-        dataset.PixelSpacing = dataset.PixelSpacing
+        dataset.ImageType = ["ORIGINAL", "PRIMARY", "", "INFRARED"]
+        dataset.PixelSpacing = [0.006868132, 0.006868132]
 
     dataset.PatientOrientation = ["L", "F"]
 

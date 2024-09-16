@@ -494,16 +494,18 @@ def convert_dicom(input, output):
     x = extract_dicom_dict(input, tags)
     filename = input.split("/")[-1]
 
-    write_dicom(conversion_rule, x, f"{output}/converted_{filename}")
-
     b = imaging_classifying_rules.extract_dicom_entry(input)
     rule = imaging_classifying_rules.find_rule(input)
+
+    convert = "no"
+    write_dicom(conversion_rule, x, f"{output}/converted_{filename}")
+    convert = "yes"
+
     dic = {
         "Rule": rule,
-        "PatientID": b.patientid,
-        "Laterality": b.laterality,
-        "Rows": b.rows,
-        "Columns": b.columns,
+        "Converted": convert,
+        "Input": input,
+        "Output": f"{output}/converted_{filename}",
     }
-    print(dic)
+
     return dic

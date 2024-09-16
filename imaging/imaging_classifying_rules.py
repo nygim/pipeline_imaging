@@ -225,7 +225,7 @@ rules = [
             and str(entry.rows) == "496"
             and str(entry.columns) == "512"
             and 510 < entry.framenumber < 514
-            and entry.filesize > 390
+            and entry.filesize > 130
         ],
     ),
     # 496, 384, 284

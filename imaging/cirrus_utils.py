@@ -46,7 +46,30 @@ cirrus_submodality_folder_mapping = {
     "enface_r": "enface",
 }
 
+modality_folder_mapping = {
+    "ir_": "retinal_photography",
+    "cfp": "retinal_photography",
+    "faf": "retinal_photography",
+    "flow_cube": "retinal_octa",
+    "segmentation": "retinal_octa",
+    "enface": "retinal_octa",
+    "_oct_": "retinal_oct",
+    "flio": "retinal_flio",
+    "Flow.": "retinal_octa",
+}
 
+submodality_folder_mapping = {
+    "ir_": "ir",
+    "cfp": "cfp",
+    "faf": "faf",
+    "_oct_l": "oct_structural_scan",
+    "_oct_r": "oct_structural_scan",
+    "flow_cube": "flow_cube",
+    "Flow.": "flow_cube",
+    "segmentation": "segmentation",
+    "enface": "enface",
+    "flio": "flio",
+}
 def get_description(filename, mapping):
     """
     Get a description based on a filename and a mapping dictionary.

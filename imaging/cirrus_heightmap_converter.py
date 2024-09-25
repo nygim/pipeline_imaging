@@ -169,6 +169,7 @@ def get_heightmap_array(seg_file):
     pixel_array = converter.zeiss_segmentation_to_heightmap()
     return pixel_array
 
+
 KEEP = 0
 BLANK = 1
 HARMONIZE = 2

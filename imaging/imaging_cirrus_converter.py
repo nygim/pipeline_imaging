@@ -85,7 +85,6 @@ def convert_dicom(folder, output):
                     print(f"An error occurred: {e}")
                 conversion_num += 1
 
-
             else:
                 print("No converter found for the file: ", file)
 
@@ -103,7 +102,6 @@ def convert_dicom(folder, output):
         struc = imaging_utils.find_string_in_files(x, "Struc.")
         ir = imaging_utils.find_string_in_files(x, "LSO")
 
-
         conversion_num = 0
         for file in x:
             if "Struc." in file:
@@ -119,7 +117,6 @@ def convert_dicom(folder, output):
                 except Exception as e:
                     print(f"An error occurred: {e}")
                 conversion_num += 1
-
 
             else:
                 print("No converter found for the file: ", file)

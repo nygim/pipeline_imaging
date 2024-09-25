@@ -457,7 +457,9 @@ def meta_data_save(filename, output_folder):
 
             os.makedirs(f"{output_folder}/retinal_octa", exist_ok=True)
 
-            with open(f"{output_folder}/retinal_octa/{filename}.json", "w") as json_file:
+            with open(
+                f"{output_folder}/retinal_octa/{filename}.json", "w"
+            ) as json_file:
                 json.dump(json_data, json_file)
 
             return dic

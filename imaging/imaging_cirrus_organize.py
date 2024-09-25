@@ -68,8 +68,8 @@ def filter_cirrus_files(folder, output):
 
                     for root, dirs, files in os.walk(folder):
                         first_file = files[0]
-                        if '350x350' in first_file:
-                            angio_files = [f for f in files if 'Angio' in f]
+                        if "350x350" in first_file:
+                            angio_files = [f for f in files if "Angio" in f]
                             if angio_files:
                                 for root, dirs, files in os.walk(folder):
                                     for file in files:
@@ -98,23 +98,28 @@ def filter_cirrus_files(folder, output):
                                             os.makedirs(outputfolder, exist_ok=True)
 
                                             # Create the destination path with just the filename, not the full path again
-                                            new_filename = (
-                                                f"{protocol}_{patientid}_{laterality}_{file}"
-                                            )
+                                            new_filename = f"{protocol}_{patientid}_{laterality}_{file}"
                                             if (
-                                                "StructuralEnface" in new_filename or
-                                                ("512x128" in new_filename and "Seg.dcm" in new_filename) or
-                                                ("200x200" in new_filename and "Seg.dcm" in new_filename)
+                                                "StructuralEnface" in new_filename
+                                                or (
+                                                    "512x128" in new_filename
+                                                    and "Seg.dcm" in new_filename
+                                                )
+                                                or (
+                                                    "200x200" in new_filename
+                                                    and "Seg.dcm" in new_filename
+                                                )
                                             ):
                                                 continue  # Skip this file and move to the next one
-                    
-                                            destination = os.path.join(outputfolder, new_filename)
+
+                                            destination = os.path.join(
+                                                outputfolder, new_filename
+                                            )
 
                                             # Copy the file
                                             shutil.copy2(file_path, destination)
 
-
-                            else: 
+                            else:
                                 for root, dirs, files in os.walk(folder):
                                     for file in files:
                                         if file[0].isalpha():
@@ -134,16 +139,22 @@ def filter_cirrus_files(folder, output):
                                             os.makedirs(outputfolder, exist_ok=True)
 
                                             # Create the destination path with just the filename, not the full path again
-                                            new_filename = (
-                                                f"{protocol}_{patientid}_{laterality}_{file}"
-                                            )
+                                            new_filename = f"{protocol}_{patientid}_{laterality}_{file}"
                                             if (
-                                                "StructuralEnface" in new_filename or
-                                                ("512x128" in new_filename and "Seg.dcm" in new_filename) or
-                                                ("200x200" in new_filename and "Seg.dcm" in new_filename)
+                                                "StructuralEnface" in new_filename
+                                                or (
+                                                    "512x128" in new_filename
+                                                    and "Seg.dcm" in new_filename
+                                                )
+                                                or (
+                                                    "200x200" in new_filename
+                                                    and "Seg.dcm" in new_filename
+                                                )
                                             ):
                                                 continue
-                                            destination = os.path.join(outputfolder, new_filename)
+                                            destination = os.path.join(
+                                                outputfolder, new_filename
+                                            )
 
                                             # Copy the file
                                             shutil.copy2(file_path, destination)
@@ -175,18 +186,24 @@ def filter_cirrus_files(folder, output):
                                         os.makedirs(outputfolder, exist_ok=True)
 
                                         # Create the destination path with just the filename, not the full path again
-                                        new_filename = (
-                                            f"{protocol}_{patientid}_{laterality}_{file}"
-                                        )
+                                        new_filename = f"{protocol}_{patientid}_{laterality}_{file}"
                                         if (
-                                            "StructuralEnface" in new_filename or
-                                            ("512x128" in new_filename and "Seg.dcm" in new_filename) or
-                                            ("200x200" in new_filename and "Seg.dcm" in new_filename)
+                                            "StructuralEnface" in new_filename
+                                            or (
+                                                "512x128" in new_filename
+                                                and "Seg.dcm" in new_filename
+                                            )
+                                            or (
+                                                "200x200" in new_filename
+                                                and "Seg.dcm" in new_filename
+                                            )
                                         ):
                                             continue
-                                        destination = os.path.join(outputfolder, new_filename)
+                                        destination = os.path.join(
+                                            outputfolder, new_filename
+                                        )
 
-                                            # Copy the file
+                                        # Copy the file
                                         shutil.copy2(file_path, destination)
 
             else:

@@ -70,6 +70,8 @@ submodality_folder_mapping = {
     "enface": "enface",
     "flio": "flio",
 }
+
+
 def get_description(filename, mapping):
     """
     Get a description based on a filename and a mapping dictionary.
@@ -85,6 +87,7 @@ def get_description(filename, mapping):
         if key in filename:
             return value
     return "Description not found"
+
 
 def format_cirrus_file(file, output):
     """
@@ -160,7 +163,7 @@ def format_cirrus_file(file, output):
                 submodality = f"{submodality}"
 
                 filename = f"{id}_{modality}_{submodality}_{laterality}_{uid}.dcm"
-                
+
             else:
                 filename = f"{id}_{modality}_{laterality}_{uid}.dcm"
 
